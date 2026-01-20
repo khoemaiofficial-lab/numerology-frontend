@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { FaBars } from "react-icons/fa";
 import { useState } from "react";
+import { getCategories } from "@/services/api";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)

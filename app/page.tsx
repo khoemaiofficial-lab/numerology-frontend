@@ -6,7 +6,6 @@ import { motion } from 'framer-motion';
 import { Playfair_Display, Inter } from 'next/font/google';
 import { Fingerprint, Mail, Star, AlertCircle, MoveRight } from 'lucide-react';
 import { slugify } from '@/lib/utils';
-import Header from './components/Header';
 
 const playfair = Playfair_Display({ subsets: ['vietnamese'], weight: ['600', '700', '900'] });
 const inter = Inter({ subsets: ['vietnamese'], weight: ['300', '400', '600'] });

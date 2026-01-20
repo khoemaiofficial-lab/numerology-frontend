@@ -6,7 +6,6 @@ import { Playfair_Display, Inter } from "next/font/google";
 import { ChevronRight, Calendar, Clock, User, ArrowLeft, Sparkles } from "lucide-react";
 
 // Kết nối Sanity
-import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { PortableText } from "@portabletext/react";
 import Header from "@/app/components/Header";
@@ -21,8 +20,6 @@ const inter = Inter({ subsets: ["vietnamese"], weight: ["300", "400", "600"] });
 export default async function BlogArticle({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const post = await getPostData(id);
-  console.log("post", post)
-  console.log("post.mainImage", post.mainImage);
   if (!post) {
     notFound();
   }

@@ -54,7 +54,7 @@ export default function InputPage() {
 
   return (
     <div className="min-h-screen bg-[#010103] flex flex-col">
-      <main className={`${inter.className} mt-20 flex-1 text-slate-300 flex flex-col items-center justify-center p-4 relative overflow-hidden antialiased`}>
+      <main className={`${inter.className} mt-8 flex-1 text-slate-300 flex flex-col items-center justify-center p-4 relative overflow-hidden antialiased`}>
         {/* hiệu ứng ánh sáng nền */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-indigo-500/10 blur-[140px] z-0" />
         

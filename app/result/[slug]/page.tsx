@@ -31,7 +31,6 @@ export default function ResultPage() {
       if (!slug) return;
 
       try {
-        // 1. GIẢI MÃ SLUG "TỬ TẾ"
         const parts = slug.split('-');
         const birthdayRaw = parts.pop(); // Lấy "26011997"
         const name = parts.join(' ').toUpperCase(); // Lấy "NGUYEN MANH DUC"

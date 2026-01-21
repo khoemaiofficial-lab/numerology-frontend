@@ -42,7 +42,7 @@ export default function ResultPage() {
         const parts = slug.split('-');
         const birthdayRaw = parts.pop() || "";
         const name = parts.join(' ').toUpperCase();
-        const formattedDate = `${birthdayRaw.slice(4, 8)}-${birthdayRaw.slice(2, 4)}-${birthdayRaw.slice(0, 2)}`;
+        // const formattedDate = `${birthdayRaw.slice(4, 8)}-${birthdayRaw.slice(2, 4)}-${birthdayRaw.slice(0, 2)}`;
 
         // 1. GỌI API TÍNH TOÁN CỐ ĐỊNH
         const data = calculateNumerology(name, birthdayRaw)
@@ -106,7 +106,7 @@ export default function ResultPage() {
           </motion.div>
           
           <div className="space-y-4">
-            <h2 className={`${playfair.className} text-3xl md:text-5xl font-bold text-white uppercase tracking-tight`}>{result.name}</h2>
+            <h2 className={`${playfair.className} mt-6 text-3xl md:text-5xl font-bold text-white uppercase tracking-tight`}>{result.name}</h2>
             <p style={{ color: auraColor }} className="text-[10px] md:text-[12px] tracking-[0.6em] font-black uppercase">{result.title}</p>
           </div>
 
@@ -129,7 +129,7 @@ export default function ResultPage() {
         </section>
 
         {/* --- SECTION 2: DAILY FORECAST WIDGET --- */}
-        <section ref={widgetRef} className="py-20 scroll-mt-20">
+        <section ref={widgetRef} className="py-12 scroll-mt-20">
             <div className="relative group p-[1px] rounded-[55px] bg-gradient-to-b from-indigo-500/40 via-transparent to-white/5 shadow-[0_0_40px_rgba(79,70,229,0.15)] transition-all duration-700 hover:shadow-[0_0_60px_rgba(79,70,229,0.25)]">
                 <div className='bg-[#050512]/95 backdrop-blur-3xl rounded-[54px] p-8 md:p-16 relative overflow-hidden'>
 

@@ -12,16 +12,15 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-// Kết nối hệ thống (Giữ nguyên các service của bạn)
+// Kết nối hệ thống
 import { client } from '@/sanity/lib/client';
 import { urlFor } from '@/sanity/lib/image';
 import { calculatePersonalAndWorldNumber } from '@/lib/utils';
 import { calculateNumerology } from '@/utils/numerology';
+import { DAILY_PREDICTIONS } from '@/app/constants/predictions';
 
 const playfair = Playfair_Display({ subsets: ['vietnamese'], weight: ['600', '700', '900'] });
 const inter = Inter({ subsets: ['vietnamese'], weight: ['300', '400', '600'] });
-
-// --- HELPER LOGIC THẦN SỐ HỌC ---
 
 export default function ResultPage() {
   const params = useParams();
@@ -31,7 +30,6 @@ export default function ResultPage() {
   const [result, setResult] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
   
-  // State cho Widget Năng lượng
   const [activeTab, setActiveTab] = useState<'mindset' | 'action' | 'opportunity'>('mindset');
   const widgetRef = useRef<HTMLDivElement>(null);
 
@@ -42,16 +40,24 @@ export default function ResultPage() {
         const parts = slug.split('-');
         const birthdayRaw = parts.pop() || "";
         const name = parts.join(' ').toUpperCase();
-        // const formattedDate = `${birthdayRaw.slice(4, 8)}-${birthdayRaw.slice(2, 4)}-${birthdayRaw.slice(0, 2)}`;
 
-        // 1. GỌI API TÍNH TOÁN CỐ ĐỊNH
-        const data = calculateNumerology(name, birthdayRaw)
+        // 1. TÍNH TOÁN CỐ ĐỊNH (Sử dụng hàm local của bạn)
+        const data = calculateNumerology(name, birthdayRaw);
 
-        // 2. TÍNH TOÁN NĂNG LƯỢNG NGÀY (Hôm nay: 21/01/2026)
-        const {worldDay, personalDay} = calculatePersonalAndWorldNumber(data);
-        setResult({ ...data, worldDay, personalDay });
+        // 2. TÍNH TOÁN NĂNG LƯỢNG NGÀY
+        const { worldDay, personalDay } = calculatePersonalAndWorldNumber(data);
+        
+        // 3. LẤY DỰ BÁO TỪ KHO 81 TỔ HỢP
+        const dailyContent = DAILY_PREDICTIONS[worldDay]?.[personalDay] || {
+            mindset: "Hãy giữ tâm thế bình thản và quan sát những biến chuyển nhỏ xung quanh bạn.",
+            action: "Hoàn thiện các kế hoạch cũ và chuẩn bị cho một chu kỳ mới đầy tiềm năng.",
+            opportunity: "Cơ hội ẩn mình sau những cuộc trò chuyện tình cờ, hãy luôn mở lòng đón nhận.",
+            energyLevel: 50
+        };
 
-        // 3. FETCH BÀI VIẾT TỪ SANITY
+        setResult({ ...data, worldDay, personalDay, dailyContent });
+
+        // 4. FETCH BÀI VIẾT TỪ SANITY
         const sanityQuery = `*[_type == "post" && targetNumber == ${data.lifePath}] | order(publishedAt desc)[0...3] {
           title, "slug": slug.current, "categoryName": category->title, mainImage
         }`;
@@ -67,7 +73,6 @@ export default function ResultPage() {
     decodeAndFetch();
   }, [slug]);
 
-  // Hàm cuộn mượt xuống Widget
   const scrollToWidget = () => {
     widgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
@@ -75,7 +80,7 @@ export default function ResultPage() {
   if (loading) return (
     <div className="min-h-screen bg-[#010103] flex flex-col items-center justify-center space-y-6">
         <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
-        <p className="text-[9px] tracking-[0.5em] text-slate-600 uppercase font-black italic">Vũ trụ đang giải mã vận mệnh...</p>
+        <p className="text-[9px] tracking-[0.5em] text-slate-600 uppercase font-black italic text-center px-6">Vũ trụ đang giải mã vận mệnh của {slug.split('-')[0]}...</p>
     </div>
   );
 
@@ -110,20 +115,20 @@ export default function ResultPage() {
             <p style={{ color: auraColor }} className="text-[10px] md:text-[12px] tracking-[0.6em] font-black uppercase">{result.title}</p>
           </div>
 
-          <div className="mt-8 bg-white/[0.02] backdrop-blur-md border border-white/5 p-8 rounded-[40px] text-xs md:text-sm text-slate-400 font-light italic leading-relaxed max-w-md shadow-2xl">
+          <div className="mt-8 bg-white/[0.02] backdrop-blur-md border border-white/5 p-8 rounded-[40px] text-xs md:text-sm text-slate-400 font-light italic leading-relaxed max-w-md shadow-2xl relative">
+             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#020205] px-4 text-indigo-500"><Sparkles size={14}/></div>
             "{result.description}"
           </div>
 
-          {/* Nút CTA Kéo xuống */}
           <button 
             onClick={scrollToWidget}
             className="mt-12 group flex flex-col items-center gap-3 cursor-pointer transition-all"
           >
-            <span className="text-[13px] font-bold tracking-[0.4em] text-slate-500 uppercase group-hover:text-white transition-colors">
+            <span className="text-[11px] font-bold tracking-[0.4em] text-slate-500 uppercase group-hover:text-white transition-colors">
                 Khám phá năng lượng hôm nay
             </span>
             <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 2.5 }}>
-                <ArrowDown className="w-7 h-7  text-slate-700 group-hover:text-indigo-500 transition-colors" />
+                <ArrowDown className="w-7 h-7 text-slate-700 group-hover:text-indigo-500 transition-colors" />
             </motion.div>
           </button>
         </section>
@@ -132,9 +137,12 @@ export default function ResultPage() {
         <section ref={widgetRef} className="py-12 scroll-mt-20">
             <div className="relative group p-[1px] rounded-[55px] bg-gradient-to-b from-indigo-500/40 via-transparent to-white/5 shadow-[0_0_40px_rgba(79,70,229,0.15)] transition-all duration-700 hover:shadow-[0_0_60px_rgba(79,70,229,0.25)]">
                 <div className='bg-[#050512]/95 backdrop-blur-3xl rounded-[54px] p-8 md:p-16 relative overflow-hidden'>
+                  
+                  {/* Backlight hiệu ứng tỏa sáng cho con số */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-600/10 blur-[100px] pointer-events-none" />
 
                   {/* Header: Ngày thế giới */}
-                  <div className="text-center mb-12 space-y-3">
+                  <div className="text-center mb-12 space-y-3 relative z-10">
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Thứ Tư, 21 Tháng 1, 2026</p>
                       <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
                           <Globe className="w-3 h-3" />
@@ -143,10 +151,10 @@ export default function ResultPage() {
                   </div>
 
                   {/* Center: Ngày Cá Nhân */}
-                  <div className="text-center mb-14">
+                  <div className="text-center mb-14 relative z-10">
                       <motion.div 
-                          initial={{ opacity: 0 }} 
-                          whileInView={{ opacity: 1 }} 
+                          initial={{ opacity: 0, scale: 0.8 }} 
+                          whileInView={{ opacity: 1, scale: 1 }} 
                           className="text-8xl md:text-9xl font-black text-white mb-2 drop-shadow-[0_0_30px_rgba(99,102,241,0.3)]"
                       >
                           {result.personalDay}
@@ -154,17 +162,17 @@ export default function ResultPage() {
                       <p className="text-[10px] font-black text-indigo-500/80 uppercase tracking-[0.6em]">Năng lượng ngày của bạn</p>
                   </div>
 
-                  {/* Content Area: Tabs */}
-                  <div className="bg-white/[0.03] border border-white/5 rounded-[35px] p-8 md:p-10 min-h-[200px] relative">
+                  {/* Content Area: Tabs Dữ liệu động */}
+                  <div className="bg-white/[0.03] border border-white/5 rounded-[35px] p-8 md:p-10 min-h-[220px] mb-10 relative z-10">
                       <AnimatePresence mode="wait">
                           {activeTab === 'mindset' && (
                               <motion.div key="mindset" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
                                   <div className="flex items-center gap-3 text-indigo-300">
                                       <Brain className="w-5 h-5" />
-                                      <h4 className="font-bold text-[11px] uppercase tracking-[0.2em]">Tâm thế hôm nay</h4>
+                                      <h4 className="font-bold text-[11px] uppercase tracking-[0.2em]">Tâm thế chủ đạo</h4>
                                   </div>
-                                  <p className="text-slate-400 text-sm md:text-base leading-relaxed font-light">
-                                      Năng lượng số {result.personalDay} thôi thúc bạn quay vào bên trong. Đừng vội vàng đưa ra quyết định lớn, hãy dành thời gian để quan sát và lắng nghe trực giác của mình.
+                                  <p className="text-slate-300 text-sm md:text-base leading-relaxed font-light">
+                                      {result.dailyContent.mindset}
                                   </p>
                               </motion.div>
                           )}
@@ -174,17 +182,22 @@ export default function ResultPage() {
                                       <Footprints className="w-5 h-5" />
                                       <h4 className="font-bold text-[11px] uppercase tracking-[0.2em]">Hành động chiến lược</h4>
                                   </div>
-                                  <p className="text-slate-400 text-sm leading-relaxed font-light">
-                                      Hãy hoàn thành những việc còn dang dở. Một buổi đi dạo một mình hoặc thiền định 15 phút sẽ giúp bạn kết nối tốt hơn với mục tiêu dài hạn.
+                                  <p className="text-slate-300 text-sm md:text-base leading-relaxed font-light">
+                                      {result.dailyContent.action}
                                   </p>
-                                  {/* Thanh năng lượng */}
+                                  {/* Thanh năng lượng tự động */}
                                   <div className="space-y-2 pt-2">
                                       <div className="flex justify-between text-[9px] uppercase tracking-widest text-slate-500">
-                                          <span>Cường độ hành động</span>
-                                          <span>85%</span>
+                                          <span>Cường độ năng lượng</span>
+                                          <span className="text-emerald-400 font-bold">{result.dailyContent.energyLevel}%</span>
                                       </div>
                                       <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                                          <motion.div initial={{ width: 0 }} animate={{ width: '85%' }} className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500" />
+                                          <motion.div 
+                                              initial={{ width: 0 }} 
+                                              animate={{ width: `${result.dailyContent.energyLevel}%` }} 
+                                              transition={{ duration: 1.2 }}
+                                              className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]" 
+                                          />
                                       </div>
                                   </div>
                               </motion.div>
@@ -193,59 +206,47 @@ export default function ResultPage() {
                               <motion.div key="opp" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
                                   <div className="flex items-center gap-3 text-amber-300">
                                       <Lightbulb className="w-5 h-5" />
-                                      <h4 className="font-bold text-[11px] uppercase tracking-[0.2em]">Cơ hội tiềm năng</h4>
+                                      <h4 className="font-bold text-[11px] uppercase tracking-[0.2em]">Hạt giống cơ hội</h4>
                                   </div>
-                                  <p className="text-slate-400 text-sm leading-relaxed font-light">
-                                      Bạn có thể nhận được một thông tin quan trọng qua một người bạn cũ hoặc một ý tưởng sáng tạo lóe lên vào cuối ngày. Hãy ghi chép lại ngay!
+                                  <p className="text-slate-300 text-sm md:text-base leading-relaxed font-light italic">
+                                      "{result.dailyContent.opportunity}"
                                   </p>
                               </motion.div>
                           )}
                       </AnimatePresence>
                   </div>
-                </div>
 
-                {/* Minimalist Tabs CTA */}
-                <div className="flex gap-3">
-                    {[
-                        { id: 'mindset', icon: <Brain />, label: 'Tâm thế' },
-                        { id: 'action', icon: <Footprints />, label: 'Hành động', locked: true },
-                        { id: 'opportunity', icon: <Lightbulb />, label: 'Cơ hội', locked: true }
-                    ].map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id as any)}
-                            className={`flex-1 flex flex-col md:flex-row items-center justify-center gap-3 py-5 rounded-[25px] border transition-all duration-500 ${
-                                activeTab === tab.id 
-                                ? "bg-white text-black border-white shadow-[0_0_30px_rgba(255,255,255,0.2)] scale-[1.02]" 
-                                : "bg-white/[0.02] border-white/5 text-slate-600 hover:text-slate-300 hover:bg-white/[0.05]"
-                            }`}
-                        >
-                            {tab.locked && activeTab !== tab.id ? (
-                                <Lock className="w-3 h-3 opacity-50" />
-                            ) : (
-                                React.cloneElement(tab.icon as any, { size: 16 })
-                            )}
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em]">{tab.label}</span>
-                        </button>
-                    ))}
+                  {/* Tabs Điều hướng tối giản */}
+                  <div className="flex gap-3 relative z-10">
+                      {[
+                          { id: 'mindset', icon: <Brain />, label: 'Tâm thế' },
+                          { id: 'action', icon: <Footprints />, label: 'Hành động', locked: true },
+                          { id: 'opportunity', icon: <Lightbulb />, label: 'Cơ hội', locked: true }
+                      ].map((tab) => (
+                          <button
+                              key={tab.id}
+                              onClick={() => setActiveTab(tab.id as any)}
+                              className={`flex-1 flex flex-col md:flex-row items-center justify-center gap-3 py-5 rounded-[25px] border transition-all duration-500 ${
+                                  activeTab === tab.id 
+                                  ? "bg-white text-black border-white shadow-[0_0_30px_rgba(255,255,255,0.2)] scale-[1.02]" 
+                                  : "bg-white/[0.02] border-white/5 text-slate-600 hover:text-slate-300 hover:bg-white/[0.05]"
+                              }`}
+                          >
+                              {tab.locked && activeTab !== tab.id ? (
+                                  <Lock className="w-3.5 h-3.5 opacity-50" />
+                              ) : (
+                                  React.cloneElement(tab.icon as any, { size: 16 })
+                              )}
+                              <span className="text-[10px] font-black uppercase tracking-[0.2em]">{tab.label}</span>
+                          </button>
+                      ))}
+                  </div>
                 </div>
             </div>
         </section>
 
-        {/* --- SECTION 3: CHỈ SỐ CỐT LÕI (CORE PILLARS) --- */}
-        {/* <section className="grid grid-cols-3 gap-4 mb-24">
-            {[
-              { label: 'LINH HỒN', val: result.soulNumber, icon: <Star className="w-3.5 h-3.5" /> },
-              { label: 'NHÂN CÁCH', val: result.personalityNumber, icon: <UserCheck className="w-3.5 h-3.5" /> },
-              { label: 'SỨ MỆNH', val: result.missionNumber, icon: <Compass className="w-3.5 h-3.5" /> }
-            ].map((p, i) => (
-              <div key={i} className="bg-white/[0.03] border border-white/5 rounded-[24px] p-6 text-center group hover:bg-white/[0.06] transition-all">
-                <div className="flex justify-center text-slate-700 group-hover:text-white transition-colors mb-2">{p.icon}</div>
-                <div className={`${playfair.className} text-3xl text-white font-bold`}>{p.val}</div>
-                <div className="text-[7px] tracking-[0.2em] text-slate-600 font-black uppercase mt-1">{p.label}</div>
-              </div>
-            ))}
-        </section> */}
+        {/* --- SECTION 3: CORE PILLARS --- */}
+        {/* Henry có thể mở lại phần này nếu muốn hiện 3 chỉ số Linh hồn/Nhân cách/Sứ mệnh */}
 
         {/* --- SECTION 4: BLOG RECOMMENDATIONS --- */}
         <section className="space-y-10 mb-28">

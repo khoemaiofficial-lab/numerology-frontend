@@ -24,3 +24,27 @@ export function capitalizeWords(str: string) {
     return sep + ch.toLocaleUpperCase('vi');
   });
 }
+
+export function calculatePersonalAndWorldNumber(data: { lifePath: number }) {
+  const today = new Date(); // Mặc định hệ thống lấy 2026 theo context
+  const d = today.getDate();
+  const m = today.getMonth() + 1;
+  const y = today.getFullYear();
+
+  const sumDigits = (n: number | string): number => 
+    n.toString().split('').reduce((a, b) => a + (parseInt(b) || 0), 0);
+
+  const reduceToSingle = (n: number): number => {
+    let res = n;
+    while (res > 9 && res !== 11 && res !== 22 && res !== 33) {
+      res = sumDigits(res);
+    }
+    return res;
+  };
+
+  
+  const worldDay = reduceToSingle(sumDigits(d) + sumDigits(m) + sumDigits(y));
+  const personalDay = reduceToSingle(worldDay + data.lifePath);
+
+  return { worldDay, personalDay };
+}

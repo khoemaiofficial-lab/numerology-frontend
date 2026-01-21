@@ -155,7 +155,7 @@ export default function ResultPage() {
                   </div>
 
                   {/* Content Area: Tabs */}
-                  <div className="bg-white/[0.03] border border-white/5 rounded-[35px] p-8 md:p-10 min-h-[200px] mb-10 relative">
+                  <div className="bg-white/[0.03] border border-white/5 rounded-[35px] p-8 md:p-10 min-h-[200px] relative">
                       <AnimatePresence mode="wait">
                           {activeTab === 'mindset' && (
                               <motion.div key="mindset" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">

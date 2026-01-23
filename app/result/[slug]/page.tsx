@@ -96,8 +96,8 @@ function ResultContent() {
 
   const calculateQuickEnergy = (dateStr: string) => {
     const digits = dateStr.replace(/\D/g, '');
-    let sum = digits.split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
-    while (sum > 9) sum = sum.toString().split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+    let sum = digits.split('').reduce((a, b) => a + parseInt(b), 0);
+    while (sum > 9) sum = sum.toString().split('').reduce((a, b) => a + parseInt(b), 0);
     return sum;
   };
 

@@ -146,9 +146,9 @@ function ResultContent() {
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault(); 
     const birthYear = new Date(partnerInfo.birthday).getFullYear();
-    const isFormValid = partnerInfo.name.trim().length >= 2 && partnerInfo.birthday !== "" && birthYear >= 1940 && birthYear <= 2026;
+    const isFormValid = partnerInfo.name.trim().length >= 2 && partnerInfo.birthday !== "" && birthYear >= 1940 && birthYear <= 2013;
     if (!isFormValid) {
-      setValidationError('Thông tin chưa chính xác (1940 - 2026).');
+      setValidationError('Thông tin chưa chính xác (1940 - 2013).');
       return;
     }
     setValidationError('');
@@ -243,7 +243,7 @@ function ResultContent() {
                     </div>
                     <div className="flex bg-white/5 backdrop-blur-md p-1.5 rounded-full border border-white/10">
                       {['mindset', 'action', 'opportunity'].map((t) => (
-                        <button key={t} onClick={() => setActiveTab(t as any)} className={`relative flex-1 py-5 z-10 text-[10px] font-black uppercase tracking-widest transition-colors cursor-pointer ${activeTab === t ? "text-black bg-white rounded-full shadow-lg" : "text-slate-500 hover:text-slate-300"}`}>
+                        <button key={t} onClick={() => setActiveTab(t as any)} className={`relative flex-1 py-5 z-10 text-[10px] rounded-full font-black uppercase tracking-widest transition-colors cursor-pointer ${activeTab === t ? "text-black bg-white rounded-full shadow-lg" : "text-slate-500 hover:text-slate-300"}`}>
                            {t === 'mindset' ? 'Tâm thế' : t === 'action' ? 'Hành động' : 'Cơ hội'}
                         </button>
                       ))}
@@ -318,7 +318,7 @@ function ResultContent() {
                           <div className="relative z-10 w-20 h-20 rounded-[30px] bg-gradient-to-br from-white/10 to-white/5 border border-white/20 flex items-center justify-center backdrop-blur-2xl shadow-2xl"><Heart size={36} className="text-pink-500 drop-shadow-[0_0_12px_rgba(236,72,153,0.8)]" fill="currentColor" /></div>
                         </div>
                         <h3 className={`${playfair.className} text-4xl md:text-5xl text-white font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60`}>Hòa hợp năng lượng</h3>
-                        <p className="text-[10px] text-slate-500 uppercase tracking-[0.5em] opacity-70">Điền thông tin và nhấn Enter để kết nối</p>
+                        <p className="text-[10px] text-slate-500 uppercase tracking-[0.5em] opacity-70">Điền thông tin</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 px-2">
                         <div className="space-y-3 group">
@@ -355,6 +355,16 @@ function ResultContent() {
                         <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-[120px] font-black text-white leading-none drop-shadow-[0_0_30px_rgba(255,255,255,0.3)] tabular-nums relative z-10">85%</motion.div>
                         <p className="text-xs font-black text-indigo-400 uppercase tracking-[0.6em] mt-4 relative z-10">Chỉ số hòa hợp toàn diện</p>
                       </div>
+                      <div className="flex flex-col md:flex-row gap-4 max-w-md mx-auto px-4">
+                        <button onClick={handleShare} className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full text-[8px] font-black uppercase tracking-[0.4em] transition-all flex items-center justify-center gap-3 shadow-xl shadow-indigo-500/20 active:scale-95 cursor-pointer">
+                          {isCopied ? <CheckCircle2 size={16} /> : <Share2 size={16} />} {isCopied ? 'ĐÃ COPY LINK' : 'CHIA SẺ KẾT QUẢ'}
+                        </button>
+                        {/* {isReceiver ? (
+                          <Link href="/" className="flex-1 py-7 bg-white text-black rounded-full text-[10px] font-black uppercase tracking-[0.4em] hover:bg-slate-200 transition-all flex items-center justify-center gap-3 shadow-xl">Tra cứu cá nhân</Link>
+                        ) : (
+                          <button onClick={resetCompatibilityModal} className="flex-1 py-7 border border-white/10 text-slate-500 rounded-full text-[10px] font-black uppercase tracking-[0.4em] hover:bg-white/5 transition-all cursor-pointer">HOÀN TẤT</button>
+                        )} */}
+                      </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-xl mx-auto px-4">
                           <CosmicEnergyBar percentage={Math.round((result.personalDay / 9) * 100)} color="#6366f1" label="Năng lượng của bạn" />
                           <CosmicEnergyBar percentage={Math.round((partnerEnergy / 9) * 100)} color="#ec4899" label={`Năng lượng ${partnerInfo.name}`} />
@@ -370,16 +380,6 @@ function ResultContent() {
                          <p className="italic text-slate-300 text-lg leading-relaxed font-light relative z-10">"{compTab === 'love' ? "Sự thấu cảm tự nhiên giúp các bạn vượt qua mọi rào cản ngôn từ." : compTab === 'work' ? "Đây là bộ đôi kiến tạo những thành tựu tài chính lớn lao và bền vững." : "Hãy học cách lắng nghe để năng lượng chung luôn được lưu thông và phát triển."}"</p>
                       </motion.div>
                       
-                      <div className="flex flex-col md:flex-row gap-4 max-w-md mx-auto px-4">
-                        <button onClick={handleShare} className="flex-1 py-7 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full text-[10px] font-black uppercase tracking-[0.4em] transition-all flex items-center justify-center gap-3 shadow-xl shadow-indigo-500/20 active:scale-95 cursor-pointer">
-                          {isCopied ? <CheckCircle2 size={16} /> : <Share2 size={16} />} {isCopied ? 'ĐÃ COPY LINK' : 'CHIA SẺ KẾT QUẢ'}
-                        </button>
-                        {isReceiver ? (
-                          <Link href="/" className="flex-1 py-7 bg-white text-black rounded-full text-[10px] font-black uppercase tracking-[0.4em] hover:bg-slate-200 transition-all flex items-center justify-center gap-3 shadow-xl">Tra cứu cá nhân</Link>
-                        ) : (
-                          <button onClick={resetCompatibilityModal} className="flex-1 py-7 border border-white/10 text-slate-500 rounded-full text-[10px] font-black uppercase tracking-[0.4em] hover:bg-white/5 transition-all cursor-pointer">HOÀN TẤT</button>
-                        )}
-                      </div>
                   </div>
                 )}
             </motion.div>

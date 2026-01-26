@@ -11,7 +11,7 @@ export default function BlogList({list}: {list: any}) {
     return (
         <div className="max-w-6xl mx-auto grid grid-cols-1 p-3 md:grid-cols-2 lg:max-w-8xl lg:grid-cols-3 gap-6">
         {list.map((post: any) => (
-          <Card key={post?.currentSlug} className="border-2 pt-0 w-86 mx-auto md:w-92 lg:w-81 hover:shadow-md hover:shadow-gray-300 dark:hover:shadow-gray-800 transition duration-300">
+          <Card key={post?.slug} className="border-2 pt-0 w-86 mx-auto md:w-92 lg:w-81 hover:shadow-md hover:shadow-gray-300 dark:hover:shadow-gray-800 transition duration-300">
             <Image
               src={urlFor(post?.mainImage).width(1200).height(500).auto("format").url()} // Use the urlFor function to generate the image URL
               width={500}

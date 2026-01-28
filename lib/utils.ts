@@ -42,9 +42,14 @@ export function calculatePersonalAndWorldNumber(data: { lifePath: number }) {
     return res;
   };
 
-  
   const worldDay = reduceToSingle(sumDigits(d) + sumDigits(m) + sumDigits(y));
   const personalDay = reduceToSingle(worldDay + data.lifePath);
 
   return { worldDay, personalDay };
 }
+
+export function reduceNumber (num: any): any {
+    if (num <= 9) return num;
+    const reduced = String(num).split('').reduce((acc, digit) => acc + Number(digit), 0);
+    return reduced > 9 ? reduceNumber(reduced) : reduced;
+};

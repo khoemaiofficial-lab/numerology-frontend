@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 import { client } from '@/sanity/lib/client';
-import { calculatePersonalAndWorldNumber } from '@/lib/utils';
+import { calculatePersonalAndWorldNumber, reduceNumber } from '@/lib/utils';
 import { calculateNumerology } from '@/utils/numerology';
 import { DAILY_PREDICTIONS } from '@/app/constants/predictions';
 import Link from 'next/link';
@@ -82,6 +82,7 @@ function ResultContent() {
   const [compTab, setCompTab] = useState<'love' | 'work' | 'lesson'>('love');
   const [partnerEnergy, setPartnerEnergy] = useState(0);
   const [isCopied, setIsCopied] = useState(false);
+  const [energyLevel, setEnergyLevel] = useState(0);
   const [isReceiver, setIsReceiver] = useState(false);
 
   // Lock scroll khi mở Modal (Tránh giật lag Mobile)
@@ -105,6 +106,7 @@ function ResultContent() {
     const decodeAndFetch = async () => {
       if (!slug) return;
       try {
+        console.log("DailyPrediction", DAILY_PREDICTIONS)
         const now = new Date();
         setCurrentDate(`${String(now.getDate()).padStart(2, '0')} . ${String(now.getMonth() + 1).padStart(2, '0')} . ${now.getFullYear()}`);
         const parts = slug.split('-');
@@ -112,7 +114,9 @@ function ResultContent() {
         const name = parts.join(' ').toUpperCase();
         const data = calculateNumerology(name, birthdayRaw);
         const { worldDay, personalDay } = calculatePersonalAndWorldNumber(data);
-        const dailyContent = DAILY_PREDICTIONS[worldDay]?.[personalDay] || { mindset: "...", action: "...", opportunity: "...", energyLevel: 50 };
+        const pDay = reduceNumber(personalDay);
+        const dailyContent = DAILY_PREDICTIONS[worldDay]?.[pDay] || { mindset: "...", action: "...", opportunity: "...", energyLevel: 50 };
+        setEnergyLevel(dailyContent.energyLevel)
         setResult({ ...data, worldDay, personalDay, dailyContent });
         const sanityQuery = `*[_type == "post" && targetNumber == ${data.lifePath}] | order(publishedAt desc)[0...3] { title, "slug": slug.current, "categoryName": category->title, mainImage }`;
         const sanityPosts = await client.fetch(sanityQuery);
@@ -215,7 +219,7 @@ function ResultContent() {
                     <div className="text-center lg:text-left relative">
                         <div className="text-[120px] md:text-[180px] font-black text-white leading-none drop-shadow-2xl">{result.personalDay}</div>
                         <p className="text-[11px] font-black text-indigo-500 uppercase tracking-[0.8em] mt-4">Năng lượng cá nhân</p>
-                        <div className="mt-12 max-w-[280px] mx-auto lg:mx-0"><EnergyBar percentage={Math.round((result.personalDay / 9) * 100)} color={auraColor} label="Năng Lượng Hành Động" /></div>
+                        <div className="mt-12 max-w-[280px] mx-auto lg:mx-0"><EnergyBar percentage={energyLevel} color={auraColor} label="Năng Lượng Hành Động" /></div>
                     </div>
                   </div>
                   <div className="flex flex-col justify-center">
@@ -243,7 +247,12 @@ function ResultContent() {
                     </div>
                     <div className="flex bg-white/5 backdrop-blur-md p-1.5 rounded-full border border-white/10">
                       {['mindset', 'action', 'opportunity'].map((t) => (
-                        <button key={t} onClick={() => setActiveTab(t as any)} className={`relative flex-1 py-5 z-10 text-[10px] rounded-full font-black uppercase tracking-widest transition-colors cursor-pointer ${activeTab === t ? "text-black bg-white rounded-full shadow-lg" : "text-slate-500 hover:text-slate-300"}`}>
+                        <button key={t} onClick={() => {
+                          console.log("DAILY_PREDICTIONS", DAILY_PREDICTIONS)
+                          console.log("DAILY_PREDICTIONS[worldDay]?.[personalDay]", )
+                            console.log("result", result)
+                            setActiveTab(t as any)}
+                          } className={`relative flex-1 py-5 z-10 text-[10px] rounded-full font-black uppercase tracking-widest transition-colors cursor-pointer ${activeTab === t ? "text-black bg-white rounded-full shadow-lg" : "text-slate-500 hover:text-slate-300"}`}>
                            {t === 'mindset' ? 'Tâm thế' : t === 'action' ? 'Hành động' : 'Cơ hội'}
                         </button>
                       ))}
